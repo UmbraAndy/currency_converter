@@ -100,7 +100,7 @@ function registerServiceWorker() {
     //check if service worker is not available return
     console.log('Start Reg MAIN');
     if (!navigator.serviceWorker) return;
-    navigator.serviceWorker.register('/currency_converter/sw.js', { scope: "/" })
+    navigator.serviceWorker.register('/currency_converter/sw.js', { scope: "/currency_converter/" })
         .then(serviceWorkerRegistration => {
             if (navigator.serviceWorker.controller) {
                 console.log('Service worker controlled');
