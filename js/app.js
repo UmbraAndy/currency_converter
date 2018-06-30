@@ -182,6 +182,8 @@ function getAllCurrenciesFromDB() {
 }
 
 function convertCurrencies() {
+    //disable UI
+    disableUI(true);
     let currencyPair = fromSelect.value + "_" + toSelect.value;
     console.log("The pair " + currencyPair);
     fetch(API_BASE_URL+'/convert?q=' + currencyPair + "&compact=y").then(convertResponse => {
@@ -190,9 +192,18 @@ function convertCurrencies() {
         const rate = json[currencyPair].val;
         const amount = amountInput.value;
         const convertedAmount = multiplyByRate(amount, rate);
-        console.log('Init text', convertedSpan.textContent)
-        convertedSpan.textContent = convertedAmount;
+        //to two decimal places
+        convertedSpan.textContent = convertedAmount.toFixed(2);        
+        disableUI(false);
     })
+}
+
+function disableUI(disableFlag)
+{
+    amountInput.disabled = disableFlag;
+    toSelect.disabled = disableFlag;
+    fromSelect.disabled = disableFlag;
+    converButton.disabled = disableFlag;
 }
 
 
