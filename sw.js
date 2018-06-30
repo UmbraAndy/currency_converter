@@ -11,6 +11,8 @@ const staticFilesToCache = ['/index.html',
 ];
 const appCaches = [staticContentCache, apiContentCache]
 const convertApiBaseUrl = 'https://free.currencyconverterapi.com';
+const API_REFERSH_INTERVAL = 120000;//units in millisec
+let API_LAST_CALL_TIME = 0;
 
 
 //handler for install
@@ -30,25 +32,26 @@ self.addEventListener('install', installEvent => {
 self.addEventListener('activate', activteEvent => {
     console.log('SW activated started');
     //force the current page be controlled by this worker immediately
-    
+
     //clean up old cache
     self.clients.claim();
     activteEvent.waitUntil(
         caches.keys()
-        .then(cacheNames => {
-            //filter out all caches that belog to this app
-            //and is not the currenct static cache version
-            //then delete them
-            return Promise.all(
-                cacheNames.filter(cacheName =>{
-                     return cacheName.startsWith(appName && !appCaches.includes(cacheName))})
-                     .map(filteredCacheName => {
-                        return caches.delete(filteredCacheName)
+            .then(cacheNames => {
+                //filter out all caches that belog to this app
+                //and is not the currenct static cache version
+                //then delete them
+                return Promise.all(
+                    cacheNames.filter(cacheName => {
+                        return cacheName.startsWith(appName && !appCaches.includes(cacheName))
                     })
-            )
-                    
-        })
-        
+                        .map(filteredCacheName => {
+                            return caches.delete(filteredCacheName)
+                        })
+                )
+
+            })
+
     )
 })
 
@@ -71,7 +74,7 @@ self.addEventListener('fetch', fetchevent => {
     }
     if (requestedUrl.origin.startsWith(convertApiBaseUrl)) {
         console.log('Serving API origin');
-        fetchevent.respondWith(serveCahcedAPI(fetchevent.request))
+        fetchevent.respondWith(serveCahcedApiOrNetworkApi(fetchevent.request))
         return;
     }
     fetchevent.respondWith(
@@ -81,8 +84,25 @@ self.addEventListener('fetch', fetchevent => {
     );
 })
 
-function serveCahcedAPI(request) {
-    let storageUrl = request.url;
+function serveCahcedApiOrNetworkApi(request) {
+    let currentTime = new Date().getTime();
+    let timeElapsed = currentTime - API_LAST_CALL_TIME;
+
+    console.log('CurrentTime: ' + currentTime + ' TimeElapsed: ' + timeElapsed + ' Last call time: ' + API_LAST_CALL_TIME + ' Interval: ' + API_REFERSH_INTERVAL);
+    //check if  cahce is stale
+    if (timeElapsed >= API_REFERSH_INTERVAL) {
+        console.log('Fetch from network')
+        return fetchAPIFromNetwork(request);
+    }
+    else {
+        console.log('Fetch from cache');
+        let cachedResponse = fetchAPIFromCahce(request);
+        return cachedResponse;
+    }
+}
+
+
+function fetchAPIFromCahce(request) {
     return caches.open(apiContentCache)
         .then(cache => {
             return cache.match(request)
@@ -91,13 +111,27 @@ function serveCahcedAPI(request) {
                         console.log('Served ' + cachedResponse + ' from cache');
                         return cachedResponse;
                     }
-                    return fetch(request).then(networkResponse => {
-                        console.log('Served ' + networkResponse + ' from network');
-                        cache.put(storageUrl, networkResponse.clone());
-                        return networkResponse;
-                    });
+                    else {
+                        console.log('New request.Could not serve from the cahce. Checking network');
+                        return fetchAPIFromNetwork(request);
+
+                    }
                 })
         })
+}
+
+function fetchAPIFromNetwork(request) {
+    let storageUrl = request.url;
+    return fetch(request).then(networkResponse => {
+        console.log('Served ' + networkResponse + ' from network');
+        API_LAST_CALL_TIME = new Date().getTime();
+        //save response to cahce
+        return caches.open(apiContentCache).then(cache => {
+            return cache.put(storageUrl, networkResponse.clone());
+        }).then(() => {
+            return networkResponse;
+        })
+    });
 }
 
 //handle message event
