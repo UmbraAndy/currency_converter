@@ -67,7 +67,7 @@ self.addEventListener('fetch', fetchevent => {
         console.log('Serving APP origin')
         const urlPath = requestedUrl.pathname;
         //if toot url was requested, return index.html
-        if (urlPath === '/') {
+        if ((urlPath === '/') || (urlPath === '/currency_converter/')) {
             fetchevent.respondWith(caches.match('/index.html'));
         }
         return;
