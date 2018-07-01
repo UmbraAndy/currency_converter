@@ -160,10 +160,10 @@ function setupUiComponents(currencies) {
     fromSelect = document.getElementById('fromCurrency');
     toSelect = document.getElementById('toCurrency');
     converButton = document.getElementById('converButton');
-    messageBox = document.getElementById('messageBox');
+    //messageBox = document.getElementById('messageBox');
     converButton.addEventListener('click', clickEvent => {
         convertCurrencies();
-        messageBox.textContent = "";
+        //messageBox.textContent = "";
     })
 
     //populate select options
@@ -187,8 +187,8 @@ function getAllCurrenciesFromDB() {
 
 function convertCurrencies() {
     //clear initial convertion
-    convertedSpan.textContent = "";
-    messageBox.textContent ="";
+    // convertedSpan.textContent = "";
+    // messageBox.textContent ="";
     //disable UI
     disableUI(true);
     let currencyPair = fromSelect.value + "_" + toSelect.value;
@@ -204,7 +204,7 @@ function convertCurrencies() {
         disableUI(false);
     }).catch(err =>{
         disableUI(false);
-        messageBox.textContent = 'Sorry we could not convert at this time.'
+        //messageBox.textContent = 'Sorry we could not convert at this time.'
         console.log(err);
     })
     
