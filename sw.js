@@ -71,7 +71,7 @@ self.addEventListener('fetch', fetchevent => {
         console.log('URLREQ',urlPath);
         //if toot url was requested, return index.html
         if ((urlPath === '/') || (urlPath === PREFIX_PATH+'/')) {
-            fetchevent.respondWith(caches.match('/index.html'));
+            fetchevent.respondWith(caches.match(PREFIX_PATH+'/index.html'));
         }
         return;
     }
