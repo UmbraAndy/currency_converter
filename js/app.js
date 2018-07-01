@@ -12,7 +12,8 @@ const DB_VERSION = 1;
 const CURRENCY_STORE = 'currency';
 const CONVERSION_STORE = 'conversions';
 const API_BASE_URL ='https://free.currencyconverterapi.com/api/v5';
-const PREFIX_PATH = "/currency_converter";//make it empty for root path
+//make it empty for local testing for github pages use /currency_converter
+const PREFIX_PATH = "";
 
 window.addEventListener('load', loadEvent => {
 
@@ -195,7 +196,11 @@ function convertCurrencies() {
         //to two decimal places
         convertedSpan.textContent = convertedAmount.toFixed(2);        
         disableUI(false);
+    }).catch(err =>{
+        disableUI(false);
+        console.log(err);
     })
+    
 }
 
 function disableUI(disableFlag)

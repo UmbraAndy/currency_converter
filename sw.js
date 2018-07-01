@@ -4,7 +4,8 @@
 const appName = 'converter';
 const staticContentCache = appName + '-static-v2';
 const apiContentCache = 'converter-api';
-const PREFIX_PATH = "/currency_converter";//make it empty for root path
+//make it empty for local testing for github pages use /currency_converter
+const PREFIX_PATH = "";
 const staticFilesToCache = [
     PREFIX_PATH+'/index.html',
     PREFIX_PATH+'/js/app.js',
@@ -34,8 +35,6 @@ self.addEventListener('install', installEvent => {
 self.addEventListener('activate', activteEvent => {
     console.log('SW activated started');
     //force the current page be controlled by this worker immediately
-
-    //clean up old cache
     self.clients.claim();
     activteEvent.waitUntil(
         caches.keys()
@@ -77,7 +76,7 @@ self.addEventListener('fetch', fetchevent => {
     }
     if (requestedUrl.origin.startsWith(convertApiBaseUrl)) {
         console.log('Serving API origin');
-        fetchevent.respondWith(serveCahcedApiOrNetworkApi(fetchevent.request))
+        fetchevent.respondWith(serveCahcedApiOrNetworkApi(fetchevent.request));
         return;
     }
     fetchevent.respondWith(
@@ -134,6 +133,9 @@ function fetchAPIFromNetwork(request) {
         }).then(() => {
             return networkResponse;
         })
+    }).catch(err=>{
+        console .log('Refresh fetch failed so reverting back to cache');
+        return fetchAPIFromCahce(request);
     });
 }
 
