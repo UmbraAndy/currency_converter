@@ -12,7 +12,7 @@ const DB_VERSION = 1;
 const CURRENCY_STORE = 'currency';
 const CONVERSION_STORE = 'conversions';
 const API_BASE_URL ='https://free.currencyconverterapi.com/api/v5';
-
+const PREFIX_PATH = "/currency_converter";//make it empty for root path
 
 window.addEventListener('load', loadEvent => {
 
@@ -100,7 +100,7 @@ function registerServiceWorker() {
     //check if service worker is not available return
     console.log('Start Reg MAIN');
     if (!navigator.serviceWorker) return;
-    navigator.serviceWorker.register('/sw.js', { scope: "/" })
+    navigator.serviceWorker.register(PREFIX_PATH+'/sw.js', { scope: PREFIX_PATH+"/" })
         .then(serviceWorkerRegistration => {
             if (navigator.serviceWorker.controller) {
                 console.log('Service worker controlled');
