@@ -5,7 +5,7 @@ const appName = 'converter';
 const staticContentCache = appName + '-static-v2';
 const apiContentCache = 'converter-api';
 //make it empty for local testing for github pages use /currency_converter
-const PREFIX_PATH = "";
+const PREFIX_PATH = "/currency_converter";
 const staticFilesToCache = [
     PREFIX_PATH+'/index.html',
     PREFIX_PATH+'/js/app.js',
@@ -87,24 +87,28 @@ self.addEventListener('fetch', fetchevent => {
 })
 
 function serveCahcedApiOrNetworkApi(request) {
-    let currentTime = new Date().getTime();
-    let timeElapsed = currentTime - API_LAST_CALL_TIME;
-
-    console.log('CurrentTime: ' + currentTime + ' TimeElapsed: ' + timeElapsed + ' Last call time: ' + API_LAST_CALL_TIME + ' Interval: ' + API_REFERSH_INTERVAL);
-    //check if  cahce is stale
-    if (timeElapsed >= API_REFERSH_INTERVAL) {
-        console.log('Fetch from network')
-        return fetchAPIFromNetwork(request);
-    }
-    else {
-        console.log('Fetch from cache');
-        let cachedResponse = fetchAPIFromCahce(request);
-        return cachedResponse;
-    }
+    //let currentTime = new Date().getTime();
+    // let timeElapsed = currentTime - API_LAST_CALL_TIME;
+    return fetchAPIFromCahce(request)
+    .catch(err =>{
+        fetchAPIFromNetwork(request);
+    })
+    // console.log('CurrentTime: ' + currentTime + ' TimeElapsed: ' + timeElapsed + ' Last call time: ' + API_LAST_CALL_TIME + ' Interval: ' + API_REFERSH_INTERVAL);
+    // //check if  cahce is stale
+    // if (timeElapsed >= API_REFERSH_INTERVAL) {
+    //     console.log('Fetch from network')
+    //     return fetchAPIFromNetwork(request);
+    // }
+    // else {
+    //     console.log('Fetch from cache');
+    //     let cachedResponse = fetchAPIFromCahce(request);
+    //     return cachedResponse;
+    // }
 }
 
 
 function fetchAPIFromCahce(request) {
+    
     return caches.open(apiContentCache)
         .then(cache => {
             return cache.match(request)
@@ -135,7 +139,7 @@ function fetchAPIFromNetwork(request) {
         })
     }).catch(err=>{
         console .log('Refresh fetch failed so reverting back to cache');
-        return fetchAPIFromCahce(request);
+        //return fetchAPIFromCahce(request);
     });
 }
 

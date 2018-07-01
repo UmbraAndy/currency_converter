@@ -58,3 +58,8 @@ However, delay the fade out process for 2.5 seconds */
     margin-top: 20px;
     width: 100%;
 }
+
+#messageBox{
+    margin-top: 20px;
+    font-size: 15px;
+}
