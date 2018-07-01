@@ -4,10 +4,11 @@
 const appName = 'converter';
 const staticContentCache = appName + '-static-v2';
 const apiContentCache = 'converter-api';
-const staticFilesToCache = ['/index.html',
-    '/js/app.js',
-    '/js/idb.js',
-    '/css/bootstrap.min.css'
+const staticFilesToCache = [
+    'currency_converter/index.html',
+    'currency_converter/js/app.js',
+    'currency_converter/js/idb.js',
+    'currency_converter/css/bootstrap.min.css'
 ];
 const appCaches = [staticContentCache, apiContentCache]
 const convertApiBaseUrl = 'https://free.currencyconverterapi.com';
